@@ -130,9 +130,14 @@ class ServerlessSeedPlugin {
   }
 
   async printToStateFile(state) {
+    const packagePath =
+      this.options.package ||
+      this.serverless.service.package.path ||
+      path.join(this.serverless.config.servicePath || ".", ".serverless");
+
     try {
       await fs.writeFile(
-        path.join(".serverless", "seed-state.json"),
+        path.join(packagePath, "seed-state.json"),
         JSON.stringify(state, null, 2)
       );
     } catch (e) {
