@@ -25,14 +25,6 @@ function applyDefaultConfig(userConfig, defaultConfig) {
   return Object.assign(defaultConfig, userConfig);
 }
 
-function createFunctionsList(functionsObject) {
-  return Object.keys(functionsObject).map((name) => ({
-    name,
-    handler: functionsObject[name].handler,
-    artifact: functionsObject[name].package.artifact,
-  }));
-}
-
 class ServerlessSeedPlugin {
   constructor(serverless, options) {
     this.options = options;
@@ -97,7 +89,7 @@ class ServerlessSeedPlugin {
         }
       }
 
-      functions = createFunctionsList(this.serverless.service.functions);
+      functions = this.createFunctionsList();
 
       state = {
         status: "success",
@@ -130,10 +122,7 @@ class ServerlessSeedPlugin {
   }
 
   async printToStateFile(state) {
-    const packagePath =
-      this.options.package ||
-      this.serverless.service.package.path ||
-      path.join(this.serverless.config.servicePath || ".", ".serverless");
+    const packagePath = this.realArtifactPath();
 
     try {
       await fs.writeFile(
@@ -145,6 +134,33 @@ class ServerlessSeedPlugin {
         "Seed: There was a problem creating the incremental deploy state file"
       );
     }
+  }
+
+  realArtifactPath() {
+    return (
+      this.options.package ||
+      this.serverless.service.package.path ||
+      path.join(this.serverless.config.servicePath || ".", ".serverless")
+    );
+  }
+
+  getRealArtifactPath(artifactPath) {
+    artifactPath = artifactPath || this.serverless.service.package.artifact;
+
+    const tmpPath = path.join(
+      this.serverless.config.servicePath,
+      ".serverless"
+    );
+    return artifactPath.replace(tmpPath, this.realArtifactPath());
+  }
+
+  createFunctionsList() {
+    const functions = this.serverless.service.functions;
+    return Object.keys(functions).map((name) => ({
+      name,
+      handler: functions[name].handler,
+      artifact: this.getRealArtifactPath(functions[name].package.artifact),
+    }));
   }
 }
 
