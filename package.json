@@ -9,6 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "lint": "eslint . --fix --ext .js,.ts",
     "test": "jest --no-watchman"
   },
   "jest": {
