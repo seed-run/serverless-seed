@@ -1,4 +1,5 @@
 node_modules
+.serverless
 .github
 tests
 *.test.js
