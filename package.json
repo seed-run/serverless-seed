@@ -1,6 +1,6 @@
 {
   "name": "serverless-seed",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A Serverless plugin for optimizing deploys in Seed",
   "main": "index.js",
   "author": {
