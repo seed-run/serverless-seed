@@ -6,5 +6,5 @@ module.exports = {
     enabled: false,
     // Disabled incremental deploys for the following stages
     disabledFor: [],
-  }
+  },
 };

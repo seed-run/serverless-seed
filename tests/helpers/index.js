@@ -14,5 +14,5 @@ module.exports = {
   successRegex,
   clearSlsCache,
   runSlsCommand,
-  removeNodeModules
+  removeNodeModules,
 };

@@ -1,29 +1,30 @@
 "use strict";
 
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs').promises;
-const normalizeFiles = require('serverless/lib/plugins/aws/lib/normalizeFiles');
+const path = require("path");
+const crypto = require("crypto");
+const fs = require("fs").promises;
+const normalizeFiles = require("serverless/lib/plugins/aws/lib/normalizeFiles");
 
 const config = require("./config");
 
 function hash(str) {
-  return crypto
-    .createHash('sha256')
-    .update(str)
-    .digest('base64');
+  return crypto.createHash("sha256").update(str).digest("base64");
 }
 
 function applyDefaultConfig(userConfig, defaultConfig) {
   if (userConfig.incremental) {
-    userConfig.incremental = Object.assign({}, defaultConfig.incremental, userConfig.incremental);
+    userConfig.incremental = Object.assign(
+      {},
+      defaultConfig.incremental,
+      userConfig.incremental
+    );
   }
 
   return Object.assign(defaultConfig, userConfig);
 }
 
 function createFunctionsList(functionsObject) {
-  return Object.keys(functionsObject).map(name => ({
+  return Object.keys(functionsObject).map((name) => ({
     name,
     handler: functionsObject[name].handler,
     artifact: functionsObject[name].package.artifact,
@@ -31,7 +32,6 @@ function createFunctionsList(functionsObject) {
 }
 
 class ServerlessSeedPlugin {
-
   constructor(serverless, options) {
     this.options = options;
     this.serverless = serverless;
@@ -40,35 +40,45 @@ class ServerlessSeedPlugin {
 
     this.stage = this.serverless.service.provider.stage;
 
-    this.pluginConfig = applyDefaultConfig(this.serverless.service.custom.seed, config);
+    this.pluginConfig = applyDefaultConfig(
+      this.serverless.service.custom.seed,
+      config
+    );
 
-    this.provider = this.serverless.getProvider('aws');
+    this.provider = this.serverless.getProvider("aws");
     this.region = this.provider.getRegion();
 
     // Get it early before the artifact info or s3 paths are added
-    this.serverlessConfigHash = hash(JSON.stringify(this.serverless.service.initialServerlessConfig));
+    this.serverlessConfigHash = hash(
+      JSON.stringify(this.serverless.service.initialServerlessConfig)
+    );
 
     this.hooks = {
-      'after:package:finalize': this.onPackage.bind(this)
+      "after:package:finalize": this.onPackage.bind(this),
     };
   }
 
   async onPackage() {
     const incrementalConfig = this.pluginConfig.incremental;
 
-    if (incrementalConfig.enabled !== true || incrementalConfig.disabledFor.indexOf(this.stage) !== -1) {
+    if (
+      incrementalConfig.enabled !== true ||
+      incrementalConfig.disabledFor.indexOf(this.stage) !== -1
+    ) {
       return;
     }
 
     this.serverless.cli.log("Seed: Generating incremental deploy state...");
 
-    const region = this.region; 
+    const region = this.region;
     const serverlessConfigHash = this.serverlessConfigHash;
 
     let state, s3Bucket, s3Key, cloudFormationTemplateHash, functions;
 
     try {
-      const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(this.serverless.service.provider.compiledCloudFormationTemplate);
+      const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(
+        this.serverless.service.provider.compiledCloudFormationTemplate
+      );
       cloudFormationTemplateHash = hash(JSON.stringify(cloudFormationTemplate));
 
       s3Key = this.serverless.service.package.artifactDirectoryName;
@@ -77,13 +87,11 @@ class ServerlessSeedPlugin {
         // Needs to get this by doing a CloudFormation describeStackResource
         // hence the await
         s3Bucket = await this.provider.getServerlessDeploymentBucketName();
-      }
-      catch(e) {
+      } catch (e) {
         // Absorb the error so we can test locally
         if (this.isLocal) {
           s3Bucket = null;
-        }
-        else {
+        } else {
           throw e;
         }
       }
@@ -99,11 +107,12 @@ class ServerlessSeedPlugin {
           functions,
           serverlessConfigHash,
           cloudFormationTemplateHash,
-        }
+        },
       };
-    }
-    catch(e) {
-      this.serverless.cli.log("Seed: There was a problem generating the incremental deploy state");
+    } catch (e) {
+      this.serverless.cli.log(
+        "Seed: There was a problem generating the incremental deploy state"
+      );
       this.serverless.cli.log(`    ${e.message}`);
 
       state = {
@@ -112,7 +121,7 @@ class ServerlessSeedPlugin {
           name: e.name,
           stack: e.stack,
           message: e.message,
-        }
+        },
       };
     }
 
@@ -121,13 +130,16 @@ class ServerlessSeedPlugin {
 
   async printToStateFile(state) {
     try {
-      await fs.writeFile(path.join(".serverless", "seed-state.json"), JSON.stringify(state, null, 2));
-    }
-    catch(e) {
-      this.serverless.cli.log("Seed: There was a problem creating the incremental deploy state file");
+      await fs.writeFile(
+        path.join(".serverless", "seed-state.json"),
+        JSON.stringify(state, null, 2)
+      );
+    } catch (e) {
+      this.serverless.cli.log(
+        "Seed: There was a problem creating the incremental deploy state file"
+      );
     }
   }
-
 }
 
 module.exports = ServerlessSeedPlugin;

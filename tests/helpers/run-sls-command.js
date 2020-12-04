@@ -11,7 +11,7 @@ async function runSlsCommand(cwd, cmd = PKG_CMD) {
 
   const { stdout } = await execPromise(`__LOCAL__=true serverless ${cmd}`, {
     cwd,
-    TIMEOUT
+    TIMEOUT,
   });
 
   return stdout.toString("utf8");

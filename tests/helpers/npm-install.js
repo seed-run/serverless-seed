@@ -16,7 +16,7 @@ async function npmInstall(cwd) {
 
     await execPromise("npm install", {
       cwd,
-      TIMEOUT
+      TIMEOUT,
     });
   }
 }

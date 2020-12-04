@@ -1,4 +1,9 @@
-const { successRegex, getSeedState, clearSlsCache, runSlsCommand } = require("../helpers");
+const {
+  successRegex,
+  getSeedState,
+  clearSlsCache,
+  runSlsCommand,
+} = require("../helpers");
 
 beforeEach(async () => {
   await clearSlsCache(__dirname);

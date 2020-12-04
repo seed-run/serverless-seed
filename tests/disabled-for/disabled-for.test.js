@@ -1,4 +1,9 @@
-const { errorRegex, successRegex, getSeedState, clearSlsCache, runSlsCommand } = require("../helpers");
+const {
+  errorRegex,
+  successRegex,
+  clearSlsCache,
+  runSlsCommand,
+} = require("../helpers");
 
 beforeEach(async () => {
   await clearSlsCache(__dirname);
@@ -14,4 +19,3 @@ test("disabled-for", async () => {
   expect(result).not.toMatch(errorRegex);
   expect(result).not.toMatch(successRegex);
 });
-
