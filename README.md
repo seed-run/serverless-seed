@@ -1,4 +1,4 @@
-# Serverless Seed Plugin
+# Serverless Seed Plugin [![npm](https://img.shields.io/npm/v/serverless-seed.svg)](https://www.npmjs.com/package/serverless-seed) [![Build Status](https://github.com/seed-run/serverless-seed/workflows/CI/badge.svg)](https://github.com/seed-run/serverless-seed/actions)
 
 A Serverless plugin for optimizing deploys in [Seed](https://seed.run). This plugin allows Seed to enable **Incremental Deploys** for your Serverless apps.
 
@@ -6,20 +6,20 @@ A Serverless plugin for optimizing deploys in [Seed](https://seed.run). This plu
 
 Install the `serverless-seed` plugin using:
 
-``` bash
+```bash
 $ npm install --save-dev serverless-seed
 ```
 
 Then add it to your `serverless.yml`.
 
-``` yaml
+```yaml
 plugins:
   - serverless-seed
 ```
 
 And enable **Incremental Deploys**.
 
-``` yaml
+```yaml
 custom:
   seed:
     incremental:
@@ -28,7 +28,7 @@ custom:
 
 To disable Incremental Deploys for certain stages.
 
-``` yaml
+```yaml
 custom:
   seed:
     incremental:
