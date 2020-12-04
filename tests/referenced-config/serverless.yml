@@ -1,0 +1,20 @@
+service: serverless-seed-test
+
+plugins:
+  - '../../index'
+
+custom: ${file(config.yml):custom}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: us-east-1
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get

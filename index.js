@@ -12,6 +12,8 @@ function hash(str) {
 }
 
 function applyDefaultConfig(userConfig, defaultConfig) {
+  userConfig = userConfig ? userConfig.seed || {} : {};
+
   if (userConfig.incremental) {
     userConfig.incremental = Object.assign(
       {},
@@ -40,11 +42,6 @@ class ServerlessSeedPlugin {
 
     this.stage = this.serverless.service.provider.stage;
 
-    this.pluginConfig = applyDefaultConfig(
-      this.serverless.service.custom.seed,
-      config
-    );
-
     this.provider = this.serverless.getProvider("aws");
     this.region = this.provider.getRegion();
 
@@ -54,12 +51,16 @@ class ServerlessSeedPlugin {
     );
 
     this.hooks = {
-      "after:package:finalize": this.onPackage.bind(this),
+      "after:package:finalize": this.afterPackageFinalize.bind(this),
     };
   }
 
-  async onPackage() {
-    const incrementalConfig = this.pluginConfig.incremental;
+  async afterPackageFinalize() {
+    const pluginConfig = applyDefaultConfig(
+      this.serverless.service.custom,
+      config
+    );
+    const incrementalConfig = pluginConfig.incremental;
 
     if (
       incrementalConfig.enabled !== true ||

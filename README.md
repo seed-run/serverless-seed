@@ -26,6 +26,8 @@ custom:
       enabled: true
 ```
 
+That's it! Now deploy to [Seed](https://seed.run) and enjoy Incremental Deploys!
+
 To disable Incremental Deploys for certain stages.
 
 ```yaml
