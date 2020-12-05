@@ -140,11 +140,10 @@ class ServerlessSeedPlugin {
   getRealArtifactPath(artifactPath) {
     artifactPath = artifactPath || this.serverless.service.package.artifact;
 
-    const tmpPath = path.join(
-      this.serverless.config.servicePath,
-      ".serverless"
-    );
-    return artifactPath.replace(tmpPath, this.realArtifactPath());
+    const pathParts = artifactPath.split("/");
+    const filename = pathParts[pathParts.length - 1];
+
+    return path.join(this.realArtifactPath(), filename);
   }
 
   createFunctionsList() {
