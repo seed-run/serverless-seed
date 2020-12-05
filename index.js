@@ -13,7 +13,9 @@ function hash(str) {
 }
 
 function applyDefaultConfig(userConfig, defaultConfig) {
-  return _.merge(defaultConfig, userConfig.seed || {});
+  userConfig = userConfig || { seed: {} };
+
+  return _.merge(defaultConfig, userConfig.seed);
 }
 
 class ServerlessSeedPlugin {
