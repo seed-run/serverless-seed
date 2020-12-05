@@ -1,28 +1,19 @@
 "use strict";
 
+const _ = require("lodash");
 const path = require("path");
 const crypto = require("crypto");
 const fs = require("fs").promises;
-const normalizeFiles = require("serverless/lib/plugins/aws/lib/normalizeFiles");
 
-const config = require("./config");
+const config = require("./src/config");
+const normalizeFiles = require("./src/normalizeFiles");
 
 function hash(str) {
   return crypto.createHash("sha256").update(str).digest("base64");
 }
 
 function applyDefaultConfig(userConfig, defaultConfig) {
-  userConfig = userConfig ? userConfig.seed || {} : {};
-
-  if (userConfig.incremental) {
-    userConfig.incremental = Object.assign(
-      {},
-      defaultConfig.incremental,
-      userConfig.incremental
-    );
-  }
-
-  return Object.assign(defaultConfig, userConfig);
+  return _.merge(defaultConfig, userConfig.seed || {});
 }
 
 class ServerlessSeedPlugin {
