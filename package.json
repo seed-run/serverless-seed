@@ -22,15 +22,15 @@
     "url": "https://github.com/seed-run/serverless-seed.git"
   },
   "dependencies": {
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "serverless": "2.15.0"
   },
   "devDependencies": {
     "eslint": "^7.14.0",
     "husky": "^4.3.0",
     "jest": "^26.6.3",
     "lint-staged": "^10.5.2",
-    "prettier": "^2.2.1",
-    "serverless": "^2.15.0"
+    "prettier": "^2.2.1"
   },
   "husky": {
     "hooks": {

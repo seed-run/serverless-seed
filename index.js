@@ -4,6 +4,7 @@ const _ = require("lodash");
 const path = require("path");
 const crypto = require("crypto");
 const fs = require("fs").promises;
+const serverlessConfigUtils = require("serverless/lib/utils/getServerlessConfigFile");
 
 const config = require("./src/config");
 const normalizeFiles = require("./src/normalizeFiles");
@@ -30,11 +31,6 @@ class ServerlessSeedPlugin {
     this.provider = this.serverless.getProvider("aws");
     this.region = this.provider.getRegion();
 
-    // Get it early before the artifact info or s3 paths are added
-    this.serverlessConfigHash = hash(
-      JSON.stringify(this.serverless.service.initialServerlessConfig)
-    );
-
     this.hooks = {
       "after:package:finalize": this.afterPackageFinalize.bind(this),
     };
@@ -57,21 +53,23 @@ class ServerlessSeedPlugin {
     this.serverless.cli.log("Seed: Generating incremental deploy state...");
 
     const region = this.region;
-    const serverlessConfigHash = this.serverlessConfigHash;
 
-    let state, s3Bucket, s3Key, cloudFormationTemplateHash, functions;
+    let state,
+      s3Bucket,
+      s3Key,
+      cloudFormationTemplateHash,
+      serverlessConfigHash,
+      functions;
 
     try {
-      const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(
-        this.serverless.service.provider.compiledCloudFormationTemplate
-      );
-      cloudFormationTemplateHash = hash(JSON.stringify(cloudFormationTemplate));
+      cloudFormationTemplateHash = this.getCloudFormationHash();
+
+      serverlessConfigHash = await this.getServerlessConfigHash();
 
       s3Key = this.serverless.service.package.artifactDirectoryName;
 
       try {
-        // Needs to get this by doing a CloudFormation describeStackResource
-        // hence the await
+        // This does a CloudFormation describeStackResource, hence the await
         s3Bucket = await this.provider.getServerlessDeploymentBucketName();
       } catch (e) {
         // Absorb the error so we can test locally
@@ -112,6 +110,21 @@ class ServerlessSeedPlugin {
     }
 
     await this.printToStateFile(state);
+  }
+
+  getCloudFormationHash() {
+    const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(
+      this.serverless.service.provider.compiledCloudFormationTemplate
+    );
+    console.log(cloudFormationTemplate);
+    return hash(JSON.stringify(cloudFormationTemplate));
+  }
+
+  async getServerlessConfigHash() {
+    const slsConfig = await serverlessConfigUtils.getServerlessConfigFile(
+      this.serverless
+    );
+    return hash(JSON.stringify(slsConfig));
   }
 
   async printToStateFile(state) {
