@@ -26,10 +26,7 @@ class ServerlessSeedPlugin {
 
     this.isLocal = process.env.__LOCAL__ === "true";
 
-    this.stage = this.serverless.service.provider.stage;
-
     this.provider = this.serverless.getProvider("aws");
-    this.region = this.provider.getRegion();
 
     this.hooks = {
       "after:package:finalize": this.afterPackageFinalize.bind(this),
@@ -37,6 +34,8 @@ class ServerlessSeedPlugin {
   }
 
   async afterPackageFinalize() {
+    const stage = this.serverless.service.provider.stage;
+
     const pluginConfig = applyDefaultConfig(
       this.serverless.service.custom,
       config
@@ -45,16 +44,19 @@ class ServerlessSeedPlugin {
 
     if (
       incrementalConfig.enabled !== true ||
-      incrementalConfig.disabledFor.indexOf(this.stage) !== -1
+      incrementalConfig.disabledFor.indexOf(stage) !== -1
     ) {
       return;
     }
 
     this.serverless.cli.log("Seed: Generating incremental deploy state...");
 
-    const region = this.region;
+    // Write to the state file to start with, so it can be used if there are any
+    // unhandled exceptions
+    await this.createStateFile();
 
     let state,
+      region,
       s3Bucket,
       s3Key,
       cloudFormationTemplateHash,
@@ -62,6 +64,8 @@ class ServerlessSeedPlugin {
       functions;
 
     try {
+      region = this.provider.getRegion();
+
       cloudFormationTemplateHash = this.getCloudFormationHash();
 
       serverlessConfigHash = await this.getServerlessConfigHash();
@@ -116,7 +120,6 @@ class ServerlessSeedPlugin {
     const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(
       this.serverless.service.provider.compiledCloudFormationTemplate
     );
-    console.log(cloudFormationTemplate);
     return hash(JSON.stringify(cloudFormationTemplate));
   }
 
@@ -125,6 +128,10 @@ class ServerlessSeedPlugin {
       this.serverless
     );
     return hash(JSON.stringify(slsConfig));
+  }
+
+  async createStateFile() {
+    await this.printToStateFile({ status: "processing" });
   }
 
   async printToStateFile(state) {
