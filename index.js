@@ -170,7 +170,6 @@ class ServerlessSeedPlugin {
     const functions = this.serverless.service.functions;
     return Object.keys(functions).map((name) => ({
       name: functions[name].name,
-      handler: functions[name].handler,
       artifact: this.getRealArtifactPath(functions[name].package.artifact),
     }));
   }
