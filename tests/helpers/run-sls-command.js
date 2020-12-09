@@ -18,7 +18,7 @@ async function runSlsCommand(cwd, cmd = PKG_CMD) {
     return stdout.toString("utf8");
   } catch (e) {
     console.log(e);
-    return;
+    return "";
   }
 }
 
