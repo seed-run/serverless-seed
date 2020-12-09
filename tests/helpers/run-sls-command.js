@@ -9,12 +9,17 @@ const PKG_CMD = "package";
 async function runSlsCommand(cwd, cmd = PKG_CMD) {
   await npmInstall(cwd);
 
-  const { stdout } = await execPromise(`__LOCAL__=true serverless ${cmd}`, {
-    cwd,
-    TIMEOUT,
-  });
+  try {
+    const { stdout } = await execPromise(`__LOCAL__=true serverless ${cmd}`, {
+      cwd,
+      TIMEOUT,
+    });
 
-  return stdout.toString("utf8");
+    return stdout.toString("utf8");
+  } catch (e) {
+    console.log(e);
+    return;
+  }
 }
 
 module.exports = runSlsCommand;
