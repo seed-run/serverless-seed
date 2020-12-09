@@ -56,12 +56,13 @@ class ServerlessSeedPlugin {
     await this.createStateFile();
 
     let state,
-      region,
-      s3Bucket,
       s3Key,
-      cloudFormationTemplateHash,
+      region,
+      layers,
+      s3Bucket,
+      functions,
       serverlessConfigHash,
-      functions;
+      cloudFormationTemplateHash;
 
     try {
       region = this.provider.getRegion();
@@ -84,6 +85,8 @@ class ServerlessSeedPlugin {
         }
       }
 
+      layers = this.createLayersList();
+
       functions = this.createFunctionsList();
 
       state = {
@@ -91,6 +94,7 @@ class ServerlessSeedPlugin {
         data: {
           s3Key,
           region,
+          layers,
           s3Bucket,
           functions,
           serverlessConfigHash,
@@ -164,6 +168,14 @@ class ServerlessSeedPlugin {
     const filename = pathParts[pathParts.length - 1];
 
     return path.join(this.realArtifactPath(), filename);
+  }
+
+  createLayersList() {
+    const layers = this.serverless.service.layers;
+    return Object.keys(layers).map((name) => ({
+      name,
+      artifact: this.getRealArtifactPath(layers[name].package.artifact),
+    }));
   }
 
   createFunctionsList() {
