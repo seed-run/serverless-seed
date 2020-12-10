@@ -131,7 +131,9 @@ class ServerlessSeedPlugin {
     const slsConfig = await serverlessConfigUtils.getServerlessConfigFile(
       this.serverless
     );
-    return hash(JSON.stringify(slsConfig));
+    return hash(
+      JSON.stringify(normalizeFiles.normalizeServerlessConfig(slsConfig))
+    );
   }
 
   async createStateFile() {
