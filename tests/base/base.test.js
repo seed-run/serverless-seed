@@ -1,6 +1,5 @@
 const path = require("path");
-const fs = require("fs").promises;
-const { getSeedState, clearSlsCache, runSlsCommand } = require("../helpers");
+const { clearSlsCache, runIncrementalSlsCmds } = require("../helpers");
 
 beforeEach(async () => {
   await clearSlsCache(__dirname);
@@ -11,19 +10,10 @@ afterAll(async () => {
 });
 
 test("base", async () => {
-  const file = path.join(__dirname, "handler.js");
-
-  const content = await fs.readFile(file);
-
-  await fs.writeFile(file, content + " /**hi**/");
-  await runSlsCommand(__dirname);
-
-  const state1 = await getSeedState(__dirname);
-
-  await fs.writeFile(file, content);
-  await runSlsCommand(__dirname);
-
-  const state2 = await getSeedState(__dirname);
+  const [state1, state2] = await runIncrementalSlsCmds(
+    __dirname,
+    path.join(__dirname, "handler.js")
+  );
 
   expect(state1.data.cloudFormationTemplateHash).toEqual(
     state2.data.cloudFormationTemplateHash

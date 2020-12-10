@@ -16,6 +16,10 @@ provider:
   stage: dev
   region: us-east-1
 
+layers:
+  layer:
+    path: layer
+
 functions:
   hello:
     handler: handler.hello
@@ -24,3 +28,9 @@ functions:
           path: hello
           method: get
 
+  cfLambda:
+    handler: edge.main
+    events:
+      - cloudFront:
+          eventType: viewer-response
+          origin: "s3://lambda-edge-seed-test.s3.amazonaws.com"

@@ -1,9 +1,5 @@
-const {
-  successRegex,
-  getSeedState,
-  clearSlsCache,
-  runSlsCommand,
-} = require("../helpers");
+const path = require("path");
+const { clearSlsCache, runIncrementalSlsCmds } = require("../helpers");
 
 beforeEach(async () => {
   await clearSlsCache(__dirname);
@@ -14,10 +10,16 @@ afterAll(async () => {
 });
 
 test("serverless-1550", async () => {
-  const result = await runSlsCommand(__dirname);
+  const [state1, state2] = await runIncrementalSlsCmds(__dirname, [
+    path.join(__dirname, "handler.js"),
+    path.join(__dirname, "edge.js"),
+    path.join(__dirname, "layer", "layer.txt"),
+  ]);
 
-  expect(result).toMatch(successRegex);
-
-  const state = await getSeedState(__dirname);
-  expect(state).toMatchObject({ status: "success" });
+  expect(state1.data.cloudFormationTemplateHash).not.toEqual(
+    state2.data.cloudFormationTemplateHash
+  );
+  expect(state1.data.serverlessConfigHash).toEqual(
+    state2.data.serverlessConfigHash
+  );
 });

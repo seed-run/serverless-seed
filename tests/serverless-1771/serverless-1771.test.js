@@ -1,9 +1,5 @@
-const {
-  successRegex,
-  getSeedState,
-  clearSlsCache,
-  runSlsCommand,
-} = require("../helpers");
+const path = require("path");
+const { clearSlsCache, runIncrementalSlsCmds } = require("../helpers");
 
 beforeEach(async () => {
   await clearSlsCache(__dirname);
@@ -13,16 +9,17 @@ afterAll(async () => {
   await clearSlsCache(__dirname);
 });
 
-/**
- * Testing 1.77.1 because 1.78.0 made a change to the Serverless config parsing
- * to add validation to the config.
- * https://github.com/serverless/serverless/releases/tag/v1.78.0
- */
 test("serverless-1771", async () => {
-  const result = await runSlsCommand(__dirname);
+  const [state1, state2] = await runIncrementalSlsCmds(__dirname, [
+    path.join(__dirname, "handler.js"),
+    path.join(__dirname, "edge.js"),
+    path.join(__dirname, "layer", "layer.txt"),
+  ]);
 
-  expect(result).toMatch(successRegex);
-
-  const state = await getSeedState(__dirname);
-  expect(state).toMatchObject({ status: "success" });
+  expect(state1.data.cloudFormationTemplateHash).not.toEqual(
+    state2.data.cloudFormationTemplateHash
+  );
+  expect(state1.data.serverlessConfigHash).toEqual(
+    state2.data.serverlessConfigHash
+  );
 });

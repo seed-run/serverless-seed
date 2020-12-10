@@ -6,8 +6,8 @@ const execPromise = promisify(exec);
 const TIMEOUT = 30000;
 const PKG_CMD = "package";
 
-async function runSlsCommand(cwd, cmd = PKG_CMD) {
-  await npmInstall(cwd);
+async function runSlsCommand(cwd, cmd = PKG_CMD, runInstall = true) {
+  runInstall && (await npmInstall(cwd));
 
   try {
     const { stdout } = await execPromise(`__LOCAL__=true serverless ${cmd}`, {
