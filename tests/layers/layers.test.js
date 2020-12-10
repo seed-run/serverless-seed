@@ -10,17 +10,17 @@ afterAll(async () => {
   await clearSlsCache(__dirname);
 });
 
-test("base", async () => {
-  const file = path.join(__dirname, "handler.js");
+test("layers", async () => {
+  const layerFile = path.join(__dirname, "layer", "layer.txt");
 
-  const content = await fs.readFile(file);
+  const content = await fs.readFile(layerFile);
 
-  await fs.writeFile(file, content + " /**hi**/");
+  await fs.writeFile(layerFile, content + " hi");
   await runSlsCommand(__dirname);
 
   const state1 = await getSeedState(__dirname);
 
-  await fs.writeFile(file, content);
+  await fs.writeFile(layerFile, content);
   await runSlsCommand(__dirname);
 
   const state2 = await getSeedState(__dirname);

@@ -48,6 +48,15 @@ test("normalize-files-cf", async () => {
           Ref: "GetLambdaVersion1",
         },
       },
+      Layer1LambdaLayerHash: {
+        Description: "Current Lambda layer hash",
+        Value: "33164e2a83a901b9e62b547ce001aa09c09deede",
+      },
+      Layer1LambdaLayerS3Key: {
+        Description: "Current Lambda layer S3Key",
+        Value:
+          "serverless/serverless-seed-test/dev/1607575759130-2020-12-10T04:49:19.130Z/layer.zip",
+      },
     },
   };
   const normalizedTemplate = normalizeFiles.normalizeCloudFormationTemplate(
@@ -55,19 +64,23 @@ test("normalize-files-cf", async () => {
   );
 
   expect(normalizedTemplate.Resources.GetLambdaVersion1).toBeUndefined();
-  expect(
-    normalizedTemplate.Resources.CfLambda1LambdaFunctionInvokePermission
-      .Properties.FunctionName.Ref
-  ).toBeNull();
-  normalizedTemplate.Resources.CloudFrontDistribution.Properties.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.forEach(
-    (lambda) => {
-      expect(lambda.LambdaFunctionARN.Ref).toBeNull();
-    }
-  );
+
+  //  Disabling Lambda@Edge test cases
+  //  expect(
+  //    normalizedTemplate.Resources.CfLambda1LambdaFunctionInvokePermission
+  //      .Properties.FunctionName.Ref
+  //  ).toBeNull();
+  //  normalizedTemplate.Resources.CloudFrontDistribution.Properties.DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations.forEach(
+  //    (lambda) => {
+  //      expect(lambda.LambdaFunctionARN.Ref).toBeNull();
+  //    }
+  //  );
 
   expect(
     normalizedTemplate.Outputs.GetLambdaFunctionQualifiedArn
   ).toBeUndefined();
+  expect(normalizedTemplate.Outputs.Layer1LambdaLayerHash.Value).toBeNull();
+  expect(normalizedTemplate.Outputs.Layer1LambdaLayerS3Key.Value).toBeNull();
 });
 
 test("normalize-files-sls", async () => {

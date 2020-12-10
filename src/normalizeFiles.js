@@ -17,43 +17,48 @@ module.exports = {
         delete normalizedTemplate.Resources[key];
       }
 
-      // Handle Lambda@Edge versions
-      if (
-        value.Type &&
-        value.Type === "AWS::Lambda::Permission" &&
-        value.Properties &&
-        value.Properties.Principal &&
-        value.Properties.Principal === "edgelambda.amazonaws.com" &&
-        value.Properties.FunctionName &&
-        value.Properties.FunctionName.Ref
-      ) {
-        value.Properties.FunctionName.Ref = null;
-      }
-
-      if (
-        key === "CloudFrontDistribution" &&
-        value.Properties &&
-        value.Properties.DistributionConfig &&
-        value.Properties.DistributionConfig.DefaultCacheBehavior
-      ) {
-        (
-          value.Properties.DistributionConfig.DefaultCacheBehavior
-            .LambdaFunctionAssociations || []
-        ).forEach(function (lambdaAssoc) {
-          if (
-            lambdaAssoc.LambdaFunctionARN &&
-            lambdaAssoc.LambdaFunctionARN.Ref
-          ) {
-            lambdaAssoc.LambdaFunctionARN.Ref = null;
-          }
-        });
-      }
+      //  Disabling Lambda@Edge test cases
+      //      // Handle Lambda@Edge versions
+      //      if (
+      //        value.Type &&
+      //        value.Type === "AWS::Lambda::Permission" &&
+      //        value.Properties &&
+      //        value.Properties.Principal &&
+      //        value.Properties.Principal === "edgelambda.amazonaws.com" &&
+      //        value.Properties.FunctionName &&
+      //        value.Properties.FunctionName.Ref
+      //      ) {
+      //        value.Properties.FunctionName.Ref = null;
+      //      }
+      //
+      //      if (
+      //        key === "CloudFrontDistribution" &&
+      //        value.Properties &&
+      //        value.Properties.DistributionConfig &&
+      //        value.Properties.DistributionConfig.DefaultCacheBehavior
+      //      ) {
+      //        (
+      //          value.Properties.DistributionConfig.DefaultCacheBehavior
+      //            .LambdaFunctionAssociations || []
+      //        ).forEach(function (lambdaAssoc) {
+      //          if (
+      //            lambdaAssoc.LambdaFunctionARN &&
+      //            lambdaAssoc.LambdaFunctionARN.Ref
+      //          ) {
+      //            lambdaAssoc.LambdaFunctionARN.Ref = null;
+      //          }
+      //        });
+      //      }
     });
 
     Object.entries(normalizedTemplate.Outputs).forEach(([key, value]) => {
+      // Remove Lambda versions
       if (value.Value && value.Value.Ref && lambdaVersions[value.Value.Ref]) {
         delete normalizedTemplate.Outputs[key];
-        return;
+      }
+      // Remove Layer Keys
+      if (key.endsWith("LambdaLayerS3Key") || key.endsWith("LambdaLayerHash")) {
+        value.Value = null;
       }
     });
 
@@ -76,12 +81,14 @@ module.exports = {
     }
 
     // Remove versions from functions
-    Object.entries(normalizedConfig.functions).forEach((entries) => {
-      const value = entries[1];
-      if (value.versionLogicalId) {
-        value.versionLogicalId = null;
-      }
-    });
+    if (normalizedConfig.functions) {
+      Object.entries(normalizedConfig.functions).forEach((entries) => {
+        const value = entries[1];
+        if (value.versionLogicalId) {
+          value.versionLogicalId = null;
+        }
+      });
+    }
 
     return normalizedConfig;
   },

@@ -10,7 +10,7 @@ afterAll(async () => {
   await clearSlsCache(__dirname);
 });
 
-test("base", async () => {
+test("lambda-edge", async () => {
   const file = path.join(__dirname, "handler.js");
 
   const content = await fs.readFile(file);
@@ -25,7 +25,7 @@ test("base", async () => {
 
   const state2 = await getSeedState(__dirname);
 
-  expect(state1.data.cloudFormationTemplateHash).toEqual(
+  expect(state1.data.cloudFormationTemplateHash).not.toEqual(
     state2.data.cloudFormationTemplateHash
   );
   expect(state1.data.serverlessConfigHash).toEqual(
