@@ -12,7 +12,7 @@ afterAll(async () => {
 test("layers", async () => {
   const [state1, state2] = await runIncrementalSlsCmds(
     __dirname,
-    path.join(__dirname, "layer", "layer.txt")
+    path.join("layer", "layer.txt")
   );
 
   expect(state1.data.cloudFormationTemplateHash).toEqual(

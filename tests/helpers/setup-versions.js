@@ -9,9 +9,12 @@ const templateTestPath = path.join(testsDir, "serverless-versions");
 // Remove node_modules from tempalte test
 fs.removeSync(path.join(templateTestPath, "node_modules"));
 
+// Create new versions
 versions.forEach(copyVersion);
 
 function copyVersion(version) {
+  console.log(`Generating tests for ${version}...`);
+
   const newPath = path.join(
     testsDir,
     processString("serverless-versions-%version-string%", version)

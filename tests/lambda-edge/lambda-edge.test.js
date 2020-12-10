@@ -1,4 +1,3 @@
-const path = require("path");
 const { clearSlsCache, runIncrementalSlsCmds } = require("../helpers");
 
 beforeEach(async () => {
@@ -10,10 +9,7 @@ afterAll(async () => {
 });
 
 test("lambda-edge", async () => {
-  const [state1, state2] = await runIncrementalSlsCmds(
-    __dirname,
-    path.join(__dirname, "handler.js")
-  );
+  const [state1, state2] = await runIncrementalSlsCmds(__dirname, "handler.js");
 
   expect(state1.data.cloudFormationTemplateHash).not.toEqual(
     state2.data.cloudFormationTemplateHash

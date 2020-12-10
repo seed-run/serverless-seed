@@ -1,3 +1,4 @@
+const path = require("path");
 const fs = require("fs").promises;
 
 const npmInstall = require("./npm-install");
@@ -6,8 +7,10 @@ const runSlsCommand = require("./run-sls-command");
 
 const contents = [];
 
-async function changeFiles(files, change = null) {
+async function changeFiles(files, cwd, change = null) {
   files.forEach(async (file, i) => {
+    file = path.join(cwd, file);
+
     if (change !== null) {
       contents[i] = await fs.readFile(file);
     }
@@ -25,12 +28,12 @@ async function runIncrementalSlsCmds(cwd, filesToChange) {
 
   await npmInstall(cwd);
 
-  await changeFiles(filesToChange, " /**hi**/");
+  await changeFiles(filesToChange, cwd, " /**hi**/");
   await runSlsCommand(cwd, "package", false);
 
   const state1 = await getSeedState(cwd);
 
-  await changeFiles(filesToChange);
+  await changeFiles(filesToChange, cwd);
   await runSlsCommand(cwd, "package", false);
 
   const state2 = await getSeedState(cwd);
