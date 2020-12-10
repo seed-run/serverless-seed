@@ -1,11 +1,11 @@
 {
-  "name": "serverless-1550",
+  "name": "serverless-%version-string%",
   "private": true,
   "description": "tests",
   "version": "0.0.1",
   "main": "handler.js",
   "license": "ISC",
   "devDependencies": {
-    "serverless": "1.55.0"
+    "serverless": "%version%"
   }
 }

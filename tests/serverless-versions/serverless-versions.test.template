@@ -9,7 +9,7 @@ afterAll(async () => {
   await clearSlsCache(__dirname);
 });
 
-test("serverless-1771", async () => {
+test("serverless-%version-string%", async () => {
   const [state1, state2] = await runIncrementalSlsCmds(__dirname, [
     path.join(__dirname, "handler.js"),
     path.join(__dirname, "edge.js"),

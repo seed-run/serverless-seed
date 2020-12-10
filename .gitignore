@@ -53,3 +53,6 @@ env.yml
 
 # Custom artifact path
 .package
+
+# Generated tests
+tests/serverless-versions-*

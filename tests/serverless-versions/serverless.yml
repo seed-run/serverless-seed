@@ -1,6 +1,6 @@
 service: serverless-seed-test
 
-frameworkVersion: "1.77.1"
+frameworkVersion: "%version%"
 
 plugins:
   - '../../index'
