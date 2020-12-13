@@ -29,7 +29,7 @@ function copyVersion(version) {
   processFile(path.join(newPath, "package.json"), version);
   processFile(path.join(newPath, "serverless.yml"), version);
   processFile(
-    path.join(newPath, "serverless-versions.test.template"),
+    path.join(newPath, "serverless-versions.template.js"),
     version,
     path.join(
       newPath,
