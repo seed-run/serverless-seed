@@ -88,6 +88,11 @@ test("normalize-files-sls", async () => {
     service: {
       name: "sample-service",
     },
+    package: {
+      individually: true,
+      artifactDirectoryName:
+        "serverless/serverless-seed-test/dev/1608056831725-2020-12-15T18:27:11.725Z",
+    },
     provider: {
       name: "aws",
       compiledCloudFormationTemplate: {
@@ -109,5 +114,6 @@ test("normalize-files-sls", async () => {
 
   expect(normalizedConfig.provider.compiledCloudFormationTemplate).toBeNull();
   expect(normalizedConfig.provider.coreCloudFormationTemplate).toBeNull();
+  expect(normalizedConfig.package.artifactDirectoryName).toBeNull();
   expect(normalizedConfig.functions.cfLambda1.versionLogicalId).toBeNull();
 });

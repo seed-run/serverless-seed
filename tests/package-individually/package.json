@@ -1,0 +1,8 @@
+{
+  "name": "package-individually",
+  "private": true,
+  "description": "tests",
+  "version": "0.0.1",
+  "main": "handler.js",
+  "license": "ISC"
+}

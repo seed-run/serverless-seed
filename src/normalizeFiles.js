@@ -80,6 +80,11 @@ module.exports = {
       normalizedConfig.provider.coreCloudFormationTemplate = null;
     }
 
+    // Handle package individually
+    if (normalizedConfig.package && normalizedConfig.package.individually) {
+      normalizedConfig.package.artifactDirectoryName = null;
+    }
+
     // Remove versions from functions
     if (normalizedConfig.functions) {
       Object.entries(normalizedConfig.functions).forEach((entries) => {

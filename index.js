@@ -61,15 +61,15 @@ class ServerlessSeedPlugin {
       layers,
       s3Bucket,
       functions,
-      serverlessConfigHash,
-      cloudFormationTemplateHash;
+      serverlessConfigString,
+      cloudFormationTemplateString;
 
     try {
       region = this.provider.getRegion();
 
-      cloudFormationTemplateHash = this.getCloudFormationHash();
+      cloudFormationTemplateString = this.getCloudFormationString();
 
-      serverlessConfigHash = await this.getServerlessConfigHash();
+      serverlessConfigString = await this.getServerlessConfigString();
 
       s3Key = this.serverless.service.package.artifactDirectoryName;
 
@@ -97,8 +97,10 @@ class ServerlessSeedPlugin {
           layers,
           s3Bucket,
           functions,
-          serverlessConfigHash,
-          cloudFormationTemplateHash,
+          serverlessConfigString,
+          cloudFormationTemplateString,
+          serverlessConfigHash: hash(serverlessConfigString),
+          cloudFormationTemplateHash: hash(cloudFormationTemplateString),
         },
       };
     } catch (e) {
@@ -120,20 +122,18 @@ class ServerlessSeedPlugin {
     await this.printToStateFile(state);
   }
 
-  getCloudFormationHash() {
+  getCloudFormationString() {
     const cloudFormationTemplate = normalizeFiles.normalizeCloudFormationTemplate(
       this.serverless.service.provider.compiledCloudFormationTemplate
     );
-    return hash(JSON.stringify(cloudFormationTemplate));
+    return JSON.stringify(cloudFormationTemplate);
   }
 
-  async getServerlessConfigHash() {
+  async getServerlessConfigString() {
     const slsConfig = await serverlessConfigUtils.getServerlessConfigFile(
       this.serverless
     );
-    return hash(
-      JSON.stringify(normalizeFiles.normalizeServerlessConfig(slsConfig))
-    );
+    return JSON.stringify(normalizeFiles.normalizeServerlessConfig(slsConfig));
   }
 
   async createStateFile() {
