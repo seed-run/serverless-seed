@@ -19,3 +19,10 @@ test("disabled-for", async () => {
   expect(result).not.toMatch(errorRegex);
   expect(result).not.toMatch(successRegex);
 });
+
+test("disabled-for-stage-option", async () => {
+  const result = await runSlsCommand(__dirname, "package --stage=prod");
+
+  expect(result).not.toMatch(errorRegex);
+  expect(result).not.toMatch(successRegex);
+});

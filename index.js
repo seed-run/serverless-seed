@@ -34,7 +34,7 @@ class ServerlessSeedPlugin {
   }
 
   async afterPackageFinalize() {
-    const stage = this.serverless.service.provider.stage;
+    const stage = this.provider.getStage();
 
     const pluginConfig = applyDefaultConfig(
       this.serverless.service.custom,
