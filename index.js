@@ -164,12 +164,14 @@ class ServerlessSeedPlugin {
   }
 
   getRealArtifactPath(artifactPath) {
-    artifactPath = artifactPath || this.serverless.service.package.artifact;
+    return artifactPath || this.serverless.service.package.artifact;
 
-    const pathParts = artifactPath.split("/");
-    const filename = pathParts[pathParts.length - 1];
-
-    return path.join(this.realArtifactPath(), filename);
+    //    artifactPath = artifactPath || this.serverless.service.package.artifact;
+    //
+    //    const pathParts = artifactPath.split("/");
+    //    const filename = pathParts[pathParts.length - 1];
+    //
+    //    return path.join(this.realArtifactPath(), filename);
   }
 
   createLayersList() {

@@ -28,6 +28,11 @@ functions:
           path: hello
           method: get
 
+  prebuilt:
+    handler: prebuilt.hello
+    package:
+      artifact: functions/prebuilt.zip
+
   cfLambda:
     handler: edge.main
     events:
