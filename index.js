@@ -164,14 +164,23 @@ class ServerlessSeedPlugin {
   }
 
   getRealArtifactPath(artifactPath) {
-    return artifactPath || this.serverless.service.package.artifact;
+    // Case 1: "package.artifact" NOT defined + sls package HAS NO custom package
+    //    artifactPath = "/path/to/.serverless/lambda.zip"
+    // Case 2: "package.artifact" NOT defined + sls package HAS custom package
+    //    artifactPath = "/path/to/.serverless/lambda.zip" (wrong! need to correct)
+    // Case 3: "package.artifact" IS defined
+    //    artifactPath = "user/defined/path/to/lambda.zip"
 
-    //    artifactPath = artifactPath || this.serverless.service.package.artifact;
-    //
-    //    const pathParts = artifactPath.split("/");
-    //    const filename = pathParts[pathParts.length - 1];
-    //
-    //    return path.join(this.realArtifactPath(), filename);
+    // Handle case 3
+    artifactPath = artifactPath || this.serverless.service.package.artifact;
+    if (!path.isAbsolute(artifactPath)) {
+      return artifactPath;
+    }
+
+    // Handle case 1, 2
+    const pathParts = artifactPath.split("/");
+    const filename = pathParts[pathParts.length - 1];
+    return path.join(this.realArtifactPath(), filename);
   }
 
   createLayersList() {

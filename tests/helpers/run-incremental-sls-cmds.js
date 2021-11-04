@@ -21,7 +21,8 @@ async function changeFiles(files, cwd, change = null) {
   });
 }
 
-async function runIncrementalSlsCmds(cwd, filesToChange) {
+async function runIncrementalSlsCmds(cwd, filesToChange, packagePath) {
+  const cmd = packagePath ? `package --package ${packagePath}` : "package";
   filesToChange = Array.isArray(filesToChange)
     ? filesToChange
     : [filesToChange];
@@ -29,14 +30,14 @@ async function runIncrementalSlsCmds(cwd, filesToChange) {
   await npmInstall(cwd);
 
   await changeFiles(filesToChange, cwd, " /**hi**/");
-  await runSlsCommand(cwd, "package", false);
+  await runSlsCommand(cwd, cmd, false);
 
-  const state1 = await getSeedState(cwd);
+  const state1 = await getSeedState(cwd, packagePath);
 
   await changeFiles(filesToChange, cwd);
-  await runSlsCommand(cwd, "package", false);
+  await runSlsCommand(cwd, cmd, false);
 
-  const state2 = await getSeedState(cwd);
+  const state2 = await getSeedState(cwd, packagePath);
 
   return [state1, state2];
 }
