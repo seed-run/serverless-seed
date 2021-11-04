@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs-extra");
 
-const versions = ["1.55.0", "1.77.1"];
+const versions = ["1.55.0", "1.77.1", "2.15.0", "2.64.1"];
 
 const testsDir = path.join(process.cwd(), "tests");
 const templateTestPath = path.join(testsDir, "serverless-versions");
