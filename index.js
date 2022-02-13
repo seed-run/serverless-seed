@@ -164,20 +164,31 @@ class ServerlessSeedPlugin {
   }
 
   getRealArtifactPath(artifactPath) {
-    // Case 1: "package.artifact" NOT defined + sls package HAS NO custom package
-    //    artifactPath = "/path/to/.serverless/lambda.zip"
-    // Case 2: "package.artifact" NOT defined + sls package HAS custom package
-    //    artifactPath = "/path/to/.serverless/lambda.zip" (wrong! need to correct)
-    // Case 3: "package.artifact" IS defined
+    // Case 1: "package.artifact" IS defined
     //    artifactPath = "user/defined/path/to/lambda.zip"
+    // Case 2: "package.artifact" NOT defined + NO sls package --package
+    //    artifactPath = "/path/to/.serverless/lambda.zip"
+    // Case 3: "package.artifact" NOT defined + HAS sls package --package
+    //    artifactPath = "/path/to/.serverless/lambda.zip" (wrong! need to correct)
+    // Case 4: serverless-bundle is used
+    //          + "package.artifact" NOT defined
+    //          + HAS sls package --package
+    //    artifactPath = ".serverless/lambda.zip"
 
-    // Handle case 3
+    // Note that we current don't have a test for Case 4, b/c with "serverless-bundle"
+    // enabled, running `sls package` directly inside terminal works, but running
+    // it through "runIncrementalSlsCmds()" inside jest test fails.
+
+    // Handle case 1
     artifactPath = artifactPath || this.serverless.service.package.artifact;
-    if (!path.isAbsolute(artifactPath)) {
+    if (
+      !path.isAbsolute(artifactPath) &&
+      !artifactPath.startsWith(".serverless")
+    ) {
       return artifactPath;
     }
 
-    // Handle case 1, 2
+    // Handle case 2, 3, 4
     const pathParts = artifactPath.split("/");
     const filename = pathParts[pathParts.length - 1];
     return path.join(this.realArtifactPath(), filename);
