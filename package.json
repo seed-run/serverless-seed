@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.20",
-    "serverless": "2.15.0"
+    "serverless": "^2.15.0"
   },
   "devDependencies": {
     "eslint": "^7.14.0",
